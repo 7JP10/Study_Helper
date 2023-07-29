@@ -1,0 +1,91 @@
+package com.zybooks.petcare;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+
+import androidx.annotation.Nullable;
+
+public class DBHelper extends SQLiteOpenHelper {
+
+    public static final String DBNAME = "RegistrationForm.db";
+
+    public DBHelper(Context context) {
+        super(context, "RegistrationForm.db", null, 1);
+    }
+
+    /*private static final class PetTable {
+        private static final String TABLE = "Pet_Table";
+        private static final String MICRO_ID = "micro_id";
+        private static final String NAME = "name";
+        private static final String GENDER = "gender";
+        private static final String EMAIL = "email";
+        private static final String ACCESS_CODE = "email";
+        private static final String BREED = "breed";
+        private static final String NEUTERED = "neutered";
+    }*/
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        db.execSQL("create table pets(micro_id TEXT primary key, name TEXT)");
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("drop table if exists pets");
+        onCreate(db);
+    }
+
+    //public Boolean insertData(String micro_id, String name, String gender, String email, String access_code, String breed, String neutered){
+    public Boolean insertData(String micro_id, String name){
+        SQLiteDatabase db = getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+
+        /*values.put(PetTable.MICRO_ID, micro_id);
+        values.put(PetTable.NAME, name);
+        values.put(PetTable.GENDER, gender);
+        values.put(PetTable.EMAIL, email);
+        values.put(PetTable.ACCESS_CODE, access_code);
+        values.put(PetTable.BREED, breed);
+        values.put(PetTable.NEUTERED, neutered);
+
+        long result = db.insert(PetTable.TABLE, null, values);*/
+
+        values.put("micro_id", micro_id);
+        values.put("name", name);
+        long result = db.insert("pets", null, values);
+
+        if(result == -1){
+            return false;
+        }else{
+            return true;
+        }
+    }
+
+    public Boolean checkMicroID(String micro_id){
+        SQLiteDatabase db = getReadableDatabase();
+        //String sql = ;
+        Cursor cursor = db.rawQuery("select * from pets where micro_id = ?", new String[] { micro_id });
+
+        if(cursor.getCount() > 0){
+            return true; //micro_id already exists
+        } else{
+            return false;
+        }
+    }
+
+    public void deleteMicroID(String micro_id) {
+
+        // on below line we are creating
+        // a variable to write our database.
+        SQLiteDatabase db = getWritableDatabase();
+
+        // on below line we are calling a method to delete our
+        // course and we are comparing it with our course name.
+        db.delete("pets", "micro_id = ?", new String[]{micro_id});
+        db.close();
+    }
+}
